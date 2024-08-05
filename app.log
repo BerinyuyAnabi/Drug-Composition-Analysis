@@ -1,0 +1,16 @@
+ERROR:root:Error in processing the uploaded file
+Traceback (most recent call last):
+  File "C:\Users\logan.anabi\Downloads\AI\pythonProject\.venv\lib\site-packages\PIL\JpegImagePlugin.py", line 639, in _save
+    rawmode = RAWMODE[im.mode]
+KeyError: 'RGBA'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\logan.anabi\Downloads\AI\pythonProject\app.py", line 90, in <module>
+    img.save('uploaded_image.jpg')
+  File "C:\Users\logan.anabi\Downloads\AI\pythonProject\.venv\lib\site-packages\PIL\Image.py", line 2568, in save
+    save_handler(self, fp, filename)
+  File "C:\Users\logan.anabi\Downloads\AI\pythonProject\.venv\lib\site-packages\PIL\JpegImagePlugin.py", line 642, in _save
+    raise OSError(msg) from e
+OSError: cannot write mode RGBA as JPEG
