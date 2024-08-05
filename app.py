@@ -6,6 +6,7 @@ import numpy as np
 import re
 from PIL import Image
 import logging
+import time
 
 # Configure logging
 logging.basicConfig(filename='app.log', level=logging.ERROR)
@@ -36,6 +37,7 @@ def extract_text(image_path):
         return result, full_text.strip(), image_bytes
     except Exception as e:
         st.error(f"Error in text extraction: {e}")
+        logging.error(f"Error in text extraction: {e}")
         return None, None, None
 
 def clean_and_split_list(input_list):
@@ -88,7 +90,14 @@ if uploaded_file:
         img.save('uploaded_image.jpg')
         st.image(img, caption='Uploaded Image', use_column_width=True)
 
-        result, full_text, image_bytes = extract_text('uploaded_image.jpg')
+        # Retry extraction
+        max_retries = 3
+        for attempt in range(max_retries):
+            result, full_text, image_bytes = extract_text('uploaded_image.jpg')
+            if result is not None and full_text is not None and image_bytes is not None:
+                break
+            time.sleep(1)  # Wait before retrying
+
         if result is not None and full_text is not None and image_bytes is not None:
             st.image(image_bytes, caption='Processed Image', use_column_width=True)
 
