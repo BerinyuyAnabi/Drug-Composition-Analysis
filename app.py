@@ -7,7 +7,6 @@ from PIL import Image
 from difflib import SequenceMatcher
 import pickle
 
-
 # Function to extract text from an image using EasyOCR
 def extract_text(image_path):
     reader = easyocr.Reader(['en'])
@@ -29,7 +28,6 @@ def extract_text(image_path):
 
     return result, full_text.strip()
 
-
 # Function to clean and split the information from the composition section on drugs
 def clean_and_split_list(input_list):
     pattern = r'[\W_0-9]+'
@@ -40,11 +38,9 @@ def clean_and_split_list(input_list):
     cleaned_list = [w.lower() for w in cleaned_list if w]
     return cleaned_list
 
-
 # Function to calculate the similarity between two strings
 def similar(a, b):
     return SequenceMatcher(None, a, b).ratio()
-
 
 # Main function to run the Streamlit app
 def main():
@@ -54,27 +50,11 @@ def main():
     with open("processed_active_substances.pkl", "rb") as f:
         processed_list = pickle.load(f)
 
-
     with open("medicine_names.pkl", "rb") as f:
         medicine_names = pickle.load(f)
 
-    with open("inn_common_names.pkl", "rb") as f:
-        inn_common_names = pickle.load(f)
-
-    with open("pharmacotherapeutic_groups.pkl", "rb") as f:
-        pharmacotherapeutic_groups = pickle.load(f)
-
-    with open("links.pkl", "rb") as f:
-        links = pickle.load(f)
-
-    # Option to upload image or take a photo
-    option = st.radio("Choose input method:", ("Upload an image", "Take a photo with camera"))
-
-    if option == "Upload an image":
-        uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
-    else:
-        uploaded_file = st.camera_input("Take a photo...")
-
+    # Upload image
+    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
     if uploaded_file is not None:
         img = Image.open(uploaded_file)
         img = img.convert('RGB')
@@ -93,26 +73,51 @@ def main():
         st.write(cleaned_list)
 
         # Matching words and finding indices
+        matching_words = []
         matching_indices = []
         for word in cleaned_list:
             for index, sublist in enumerate(processed_list):
                 if word in sublist:
+                    matching_words.append(word)
                     matching_indices.append(index)
 
+        st.write("Matching words:")
+        st.write(set(matching_words))
         st.write("Indices of matching sublists:")
         st.write(set(matching_indices))
 
-        # Extract matching medicine names and additional information
-        if matching_indices:
-            st.write("Matching Information:")
-            for index in set(matching_indices):
-                st.write(f"Medicine Name: {medicine_names[index]}")
-                st.write(f"INN/Common Name: {inn_common_names[index]}")
-                st.write(f"Pharmacotherapeutic Group: {pharmacotherapeutic_groups[index]}")
-                st.write(f"[More Information]({links[index]})")
-        else:
-            st.write("No matching active substances found in the provided image.")
+        # Check for matching medicine name
+        found_match = False
+        if len(matching_words) != 0:
+            for word in set(cleaned_list):
+                if word.lower() in medicine_names:
+                    st.write(f"The medicine name is: {word}")
+                    found_match = True
+                    break
+                for item in medicine_names:
+                    if word in item:
+                        if len(word) > 4:
+                            st.write(f"The medicine name is: {item}")
+                            found_match = True
+                            break
+                if found_match:
+                    break
 
+            if not found_match:
+                max_similarity = 0
+                best_match = ""
+                for word in set(cleaned_list):
+                    for item in medicine_names:
+                        similarity = similar(word.lower(), item)
+                        if similarity > max_similarity:
+                            max_similarity = similarity
+                            best_match = item
+                if max_similarity > 0.7:  # Set a threshold for similarity
+                    st.write(f"The most similar medicine name is: {best_match}")
+                else:
+                    st.write("No matching medicine name found with high similarity.")
+        else:
+            st.write("No matching medicine name found.")
 
 if __name__ == "__main__":
     main()
