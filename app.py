@@ -1,17 +1,14 @@
 import streamlit as st
 import easyocr
 import cv2
-import matplotlib.pyplot as plt
-from PIL import Image
-import re
 import pandas as pd
 import numpy as np
-import base64
-from io import BytesIO
-from signal import signal, SIGPIPE, SIG_DFL
+import re
+from PIL import Image
+import logging
 
-# Ignore SIG_PIPE signals
-signal(SIGPIPE, SIG_DFL)
+# Configure logging
+logging.basicConfig(filename='app.log', level=logging.ERROR)
 
 def extract_text(image_path):
     """Extracts text from an image using EasyOCR."""
@@ -161,4 +158,5 @@ if uploaded_file:
                 else:
                     st.write("No data about this drug, take caution!!")
     except Exception as e:
+        logging.error("Error in processing the uploaded file", exc_info=True)
         st.error(f"Error in processing the uploaded file: {e}")
