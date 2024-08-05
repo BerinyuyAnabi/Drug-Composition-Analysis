@@ -5,3 +5,4 @@ pillow
 streamlit
 pandas
 numpy
+streamlit-webrtc

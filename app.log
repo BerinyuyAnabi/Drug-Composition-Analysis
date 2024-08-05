@@ -14,3 +14,5 @@ Traceback (most recent call last):
   File "C:\Users\logan.anabi\Downloads\AI\pythonProject\.venv\lib\site-packages\PIL\JpegImagePlugin.py", line 642, in _save
     raise OSError(msg) from e
 OSError: cannot write mode RGBA as JPEG
+ERROR:asyncio:Task was destroyed but it is pending!
+task: <Task pending name='Task-8459' coro=<RTCPeerConnection.close() done, defined at C:\Users\logan.anabi\Downloads\AI\pythonProject\.venv\lib\site-packages\aiortc\rtcpeerconnection.py:478> wait_for=<Future finished result=True>>
