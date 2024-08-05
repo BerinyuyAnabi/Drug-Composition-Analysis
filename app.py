@@ -8,8 +8,10 @@ import pandas as pd
 import numpy as np
 import base64
 from io import BytesIO
+from signal import signal, SIGPIPE, SIG_DFL
 
-# Define functions here
+# Ignore SIG_PIPE signals
+signal(SIGPIPE, SIG_DFL)
 
 def extract_text(image_path):
     """Extracts text from an image using EasyOCR."""
